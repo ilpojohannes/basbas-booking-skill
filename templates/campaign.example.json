@@ -1,0 +1,19 @@
+{
+  "campaign_id": "demo-dinner",
+  "date": "2026-11-25",
+  "party": 4,
+  "slot_preferences": [
+    "18:00",
+    "19:00",
+    "17:00"
+  ],
+  "release_at": "2026-10-26T00:00:00+02:00",
+  "windows": [
+    {
+      "start": "2026-10-26T00:00:00+02:00",
+      "end": "2026-10-26T00:08:00+02:00"
+    }
+  ],
+  "note": "",
+  "email_check_opt_in": false
+}

@@ -1,0 +1,219 @@
+{
+  "id": "mod_0VWSE3bovStZfY",
+  "restaurant_id": "res_0VWSAUspRta7lU",
+  "name": "baskeri_basso",
+  "description": "",
+  "available_locales": [
+    "fi",
+    "en",
+    "sv",
+    "et"
+  ],
+  "referral_key": "t7c5hxb",
+  "accept_requests": false,
+  "initial_status": null,
+  "pending_booking_ttl": "00:07:00",
+  "book_required_for_pending": [
+    "persons",
+    "time",
+    "customer.email",
+    "customer.first_name",
+    "customer.last_name",
+    "customer.phone"
+  ],
+  "book_required_for_confirmed": [
+    "persons",
+    "time",
+    "customer.email",
+    "customer.first_name",
+    "customer.last_name",
+    "customer.phone"
+  ],
+  "auto_confirm_lead_time": null,
+  "reminder_lead_time": "24:00:00",
+  "steps": [
+    {
+      "type": "message",
+      "title": "Welcome",
+      "messages": [
+        {
+          "title": "Welcome",
+          "locale": "en",
+          "description": "Baskeri & Basso Bistro, located within the courtyard of Tehtaankatu. Test fixture only; not live terms."
+        }
+      ],
+      "required": false
+    },
+    {
+      "type": "persons",
+      "title": null,
+      "messages": [],
+      "required": true,
+      "max_persons": 7,
+      "min_persons": 1,
+      "allow_children": false,
+      "group_bookings": false,
+      "children_max_age": 16,
+      "children_min_age": 0,
+      "request_min_persons": null
+    },
+    {
+      "type": "timepicker",
+      "title": null,
+      "messages": [],
+      "required": true
+    },
+    {
+      "type": "customer_info",
+      "title": null,
+      "fields": [
+        "customer.email",
+        "customer.first_name",
+        "customer.last_name",
+        "customer.phone",
+        "customer.note"
+      ],
+      "messages": [],
+      "required": true
+    },
+    {
+      "type": "promotions",
+      "title": null,
+      "messages": [],
+      "required": false
+    },
+    {
+      "type": "items",
+      "title": null,
+      "messages": [],
+      "required": false
+    },
+    {
+      "type": "payment",
+      "title": null,
+      "messages": [],
+      "required": false
+    },
+    {
+      "type": "confirmation",
+      "title": null,
+      "messages": [],
+      "required": true
+    }
+  ],
+  "access_type": "public",
+  "appearance": {
+    "logo": {
+      "src": "https://tocom-image.tableonline.workers.dev/c/res_0VWSAUspRta7lU/1790664509178-fsak2.png",
+      "size": 256,
+      "position": "center"
+    },
+    "banner": {
+      "style": "none"
+    },
+    "colors": {
+      "page": "#ffffff",
+      "accent": "#20b8cf",
+      "success": "#2fcc95",
+      "gradient": "#20b8cf",
+      "accentText": "#13161b",
+      "gradientText": "#13161b"
+    },
+    "header": {
+      "height": 256
+    },
+    "styles": {
+      "selectionStyle": "filled"
+    }
+  },
+  "is_default": true,
+  "active": true,
+  "source": "website",
+  "partner_program_ids": [],
+  "created_at": "2030-01-01T00:00:00Z",
+  "updated_at": "2030-01-01T00:00:00Z",
+  "default_locale": "fi",
+  "consents": {
+    "terms_of_use": {
+      "language": "en",
+      "required": true,
+      "version": "tableonline-terms-2026-10-05",
+      "accepted_versions": [
+        "tableonline-terms-2026-10-05",
+        "tableonline-terms-2025-11-13"
+      ],
+      "label": "By confirming my reservation I accept the terms of use",
+      "link": "the terms of use",
+      "label_key": "Booking.terms.acceptLabel",
+      "document": {
+        "date": "2030-01-01",
+        "file": "test-fixture",
+        "markdown": "Synthetic local test terms. No live booking authorization. No payment or marketing consent.",
+        "page": "en",
+        "platform": "tableonline",
+        "version": "tableonline-terms-2026-10-05"
+      }
+    },
+    "privacy_policy": {
+      "language": "en",
+      "heading": "Personal data:",
+      "notice": "Synthetic privacy notice for local tests.",
+      "link": "privacy policy",
+      "document": {
+        "date": "2030-01-01",
+        "file": "test-fixture",
+        "markdown": "Synthetic local test terms. No live booking authorization. No payment or marketing consent.",
+        "page": "en",
+        "platform": "tableonline",
+        "version": "tableonline-privacy-2026-10-05"
+      }
+    },
+    "restaurant_marketing": {
+      "language": "en",
+      "required": false,
+      "version": "restaurant-marketing-2026-09-28",
+      "label": "I allow Baskeri & Basso to use my contact details for marketing purposes",
+      "label_template": "I allow {restaurant} to use my contact details for marketing purposes",
+      "hint": "The restaurant may use your contact details to send promotional messages, offers, and other marketing communications."
+    },
+    "newsletter": {
+      "language": "en",
+      "required": false,
+      "offered": false,
+      "version": "tableonline-newsletter-2026-09-29",
+      "label": "I want to receive news from TableOnline"
+    }
+  },
+  "platform": "tableonline",
+  "guest_country_code": "FI",
+  "timezone": "Europe/Helsinki",
+  "requires_access": false,
+  "areas": [
+    {
+      "id": "ara_0VWSDN5CqmGd2O",
+      "name": "Speed area",
+      "min_persons": 1,
+      "max_persons": 2
+    },
+    {
+      "id": "ara_0VWSDNDQL33QKg",
+      "name": "Bistro",
+      "min_persons": 1,
+      "max_persons": 56
+    }
+  ],
+  "persons_settings": {
+    "group_bookings": false,
+    "min_persons": 1,
+    "max_persons": 7,
+    "allow_children": false,
+    "children_min_age": 0,
+    "children_max_age": 16,
+    "request_min_persons": null
+  },
+  "booking_day_range": 30,
+  "last_bookable_date": "2026-12-01",
+  "partner_programs": [],
+  "payment_methods": [],
+  "integration_providers": []
+}

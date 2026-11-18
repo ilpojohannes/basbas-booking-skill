@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+*contact.local*
+*approval.local*
+state/
+reports/
