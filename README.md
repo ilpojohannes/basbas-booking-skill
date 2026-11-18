@@ -1,6 +1,6 @@
 # BasBas-pöytävarausskilli
 
-Anna agenttisi yrittää pöytävarausta alkuperäiseen BasBas Bistroon. Skilli ei ole erillinen agentti eikä takaa pöytää.
+Pöytä BasBasiin ilman keskiyön päivystystä. Skilli hoitaa agenttisi kanssa valmistelut, varausyrityksen ja vahvistuksen tarkistamisen.
 
 ## Näin varaus etenee
 
