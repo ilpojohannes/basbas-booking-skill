@@ -20,8 +20,11 @@ flowchart TD
 *Kuvitteellinen tilanne, ei oikea varaus.*
 
 **Sinä:** Pöytä neljälle BasBas Bistroon 25.11.2026. Mieluiten klo 18, sitten 19 tai 17.
+
 **Agentti:** Tarvitaanko allergia- tai muuta huomautusta? En pysty välittämään niitä. Jos tarvitaan, varaus pitää tehdä itse; en kysy vielä yhteystietoja.
+
 **Sinä:** Ei tarvita.
+
 **Agentti:** Käytetään hyväksymääsi yksityistä yhteystietotiedostoa. Ennen lupapyyntöä tarkistan ehdot ja sovitaan yritysaika sekä minne kerron tuloksen. Kerron myös, jos ajastus ei onnistu.
 
 ## Aloita tästä
