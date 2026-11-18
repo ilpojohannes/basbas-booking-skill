@@ -1,7 +1,7 @@
 ---
 name: basbas-booking-public
 description: "Use when booking the original BasBas Bistro safely."
-version: 1.0.0
+version: 1.1.0
 ---
 
 # Pöytä BasBasiin. Ei taikatemppuja.
@@ -11,12 +11,12 @@ Virallinen sivu https://basbas.fi/bistro/ ja sen varauslinkki. Nykyinen moduuli 
 
 ## 1. Kysy puuttuvat asiat, älä täytä niitä itse
 
-**Kerro heti ennen yhteystietoja tai ajastusta:** ”Tämä versio ei välitä allergioita, erityisruokavalioita tai muita huomautuksia ravintolalle. Jos tarvitset sellaisen, emme jatka automaattivarausta; varaa itse ravintolan virallisen varauslinkin kautta ja varmista huomautuksen perillemeno ravintolalta.” Kysy tämän jälkeen, tarvitaanko huomautusta. Jos kyllä, pysähdy tähän: älä kerää yhteystietoja, pyydä varausvaltuutusta tai luo ajastusta. Älä ehdota allergian pois jättämistä. `note_field_unknown` on ehdoton este jo ennen selaimen käynnistystä, ei yritys kokeilla mahdollista uutta lomakekenttää.
+Kysy allergiat, erityisruokavaliot ja muut huomautukset ennen varausvaltuutusta. Tallenna käyttäjän hyväksymä täsmällinen teksti yksityisen konfiguraation `note`-kenttään; ei huomautusta = `""`. Älä jätä allergiaa pois automatisoinnin vuoksi. Huomautus välitetään varauksen mukana ja tarkistetaan palveluntarjoajan read-backista. Tämä ei takaa ravintolan mahdollisuutta toteuttaa pyyntöä tai allergeeniturvallisuutta.
 
 - Ruokailupäivä **vuosineen** tai paremmuusjärjestykseen laitetut vaihtoehtoiset päivät. Tarkista päivämäärän viikonpäivä ohjelmallisesti ja kerro ristiriidasta. Älä muuta päivää hiljaa.
 - Henkilömäärä. Tarkista nykyisestä live-käyttöliittymästä tuettu määrä (v1 hyväksyy 1–7, ei tarkoita että pöytiä löytyy).
 - Ovatko kellonajat **täsmällinen paremmuusjärjestys** (esim. 18, 19, 17) vai **jatkuva aikaväli**, jonka sisällä muita aloitusaikoja saa valita? Diskreettiin listaan ei saa keksiä väliaikoja. Aikavälille kysy ihanneaika ja tasatilanteen järjestys; muodosta vasta sitten eksplisiittinen `slot_preferences`.
-- Erityisruokavaliot, allergiat ja huomautus, myös vastaus ”ei”. V1 ei lähetä huomautuksia: ei-tyhjä `note` on ennen kirjoitusta pysäyttävä manuaalisen varauksen este, ei syy jättää allergiaa pois.
+- Erityisruokavaliot, allergiat ja huomautus, myös vastaus ”ei”. Enintään 2000 UTF-16-koodiyksikköä; pelkkä tyhjä tila ei kelpaa. Tekstiä ei lyhennetä, siistitä tai kirjata lokeihin. Jos palvelu muuttaa tekstiä, kirjoitus estetään eikä allergiaa poisteta.
 - Varaajan yhteystiedot paikallisesta käyttäjän hyväksymästä lähteestä. Ei salasanoja tai yhteystietoja chattiin. Erillinen omistettu 0600 JSON, ei agentin globaalia ympäristöä.
 
 Kysy erillisenä, vapaaehtoisena asiana täsmälleen:
@@ -42,7 +42,7 @@ Uusi maksu, ennakkomaksu, korttitakuu, no-show/peruutusmaksu, minimikulutus, ole
 
 Sano ”valmistelut ovat valmiit” vasta kun **kaikki** on todennettu:
 
-- [ ] Bistro, päivät, henkilömäärä, aikajärjestys ja yritysikkunat on sovittu; huomautusta ei tarvita. Käyttäjän täsmällinen varausvaltuutus on tallennettu tälle kokonaisuudelle ja nykyisille ehdoille.
+- [ ] Bistro, päivät, henkilömäärä, aikajärjestys ja yritysikkunat sekä täsmällinen huomautus (tai ettei sitä tarvita) on sovittu. Käyttäjän täsmällinen varausvaltuutus on tallennettu tälle kokonaisuudelle ja nykyisille ehdoille.
 - [ ] Yhteystietolähde on käyttäjän hyväksymä ja erillinen yksityinen 0600-tiedosto; ympäröivä hakemisto 0700. Ei yhteystietoja chattiin tai ajastimen komentoon.
 - [ ] Paikallinen selain toimii. Edellisen päivän `previous-day` on tuottanut tuoreen `compatibility-ready`-tuloksen samalle `scope_hash`-arvolle, `mode=dry-run`; palveluntarjoajan kirjoitukset on estetty ja paikalliset harjoitukset läpäisty. Tarkista myös oikea päivä kohdan 4 mukaan.
 - [ ] Käyttäjän hyväksymä kestävä kertaluonteinen ajastus on luettu takaisin käytössä olevasta ajastimesta: täsmälleen sovittu suoritushetki, aikavyöhyke, komento, yksi kampanja ja sallittu aikaraja. Pelkkä työkalun löytyminen ei riitä.
@@ -60,7 +60,7 @@ Kopioi esimerkkikonfiguraatio yksityiseen hakemistoon, muuta arvot sovittuun man
 2. `python -m unittest discover -s tests -v` ja `python tests/browser_flows.py -v`.
 3. Päivänä ennen **vapautumista**, ei ruokailua: `python scripts/cli.py previous-day --config CONFIG`. Tämä yhdistää kirjoitukset estetyn live-yhteensopivuustarkistuksen ja paikallisesti interceptoidut success/fallback/pending/canceled-harjoitukset. Vapautumaton tavoite ei ole virhe yhteensopivuustestissä, mutta ei myöskään näyttö tarjolla olevasta pöydästä. Viimeisin epäonnistuminen korvaa aiemman onnistumisen.
 4. Vapautumishetkellä `python scripts/cli.py release-rehearsal --config CONFIG`: kaikki palveluntarjoajan kirjoitukset estetty, yhteystietoja ei lueta eikä syötetä. Commit edellyttää alle 5 minuuttia vanhaa `dry-run-ready`-tulosta sekä edellisen päivän `compatibility-ready`-tulosta täsmälleen samalle konfiguraatiolle.
-5. Vain hyväksytyssä ikkunassa, oikeilla aiemmilla tuloksilla ja käyttäjän luvalla: `python scripts/runner.py --config CONFIG --mode commit --approval-file APPROVAL --contact-file CONTACT`. **Tätä komentoa ei ajeta asennus- tai jakelutestinä.** Kontaktikenttien täyttäminen voi jo itsessään tehdä varauksen; kirjoitusportti ja yritysmerkintä on siksi aseistettu ennen syöttöä.
+5. Vain hyväksytyssä ikkunassa, oikeilla aiemmilla tuloksilla ja käyttäjän luvalla: `python scripts/runner.py --config CONFIG --mode commit --approval-file APPROVAL --contact-file CONTACT`. **Tätä komentoa ei ajeta asennus- tai jakelutestinä.** Kontaktikenttien täyttäminen voi jo itsessään tehdä varauksen; verkkokirjoitusten portti on siksi käytössä ennen syöttöä. Ehtoruutu pidetään pois päältä, kunnes kontaktien jälkeen paljastuva `textarea#note` on täytetty ja tarkistettu. Ennenaikainen POST estetään pysyvästi paikallisesti ja ajo päättyy ennen kirjoitusta; sitä ei toisteta. Vain hyväksytyn POSTin välitön verkkolähetys luo pysyvän yritysmerkinnän.
 
 Runner käyttää nykyisen UI:n havaittua yhtä POST-sopimusta, ei legacy-API:a. Tuore selain tarkistaa moduulin, ravintolan, Bistro-tervehdyksen, päivän, henkilöt, ajat, ehdot ja rahaehdot uudelleen. Service workerit ja WebSocketit estetään. Markkinointi pysyy pois. Tuntemattomat pyynnöt, lisätuotteet tai vastaustilat pysäyttävät.
 
@@ -69,6 +69,8 @@ V1:n runner käsittelee yhtä päivää per konfiguraatio. Agentti käsittelee h
 ## 5. Päättele lopputulos varovasti
 
 Ainoa success: exact read-back samasta booking ID:stä, oikeat moduuli- ja ravintola-ID:t, päivä, henkilömäärä ja Helsinki-aika, `reserved`/`confirmed`, `state.current` sama, `ttl=null`, puuttuvat kentät/promootiot täsmälleen tyhjiä, nollamaksut ja ei takuuta. UTC pitää muuntaa Europe/Helsinkiin, ei käyttää aina +02. Tarkista näkyvä vahvistus kun saatavilla; sen puute raportoidaan varoituksena. Vapaaehtoinen sähköposti voi vahvistaa vain tämän varauksen, jos lupa ja yhteys ovat olemassa.
+
+Jos huomautus on annettu, myös `customer.note` pitää palautua täsmälleen hyväksyttynä. Puuttuva tai eri teksti tarkoittaa `submitted-or-ambiguous` ja `note_delivery=unverified`: kerro erikseen, ettei huomautuksen perillemenoa ole varmennettu. Älä varaa uudelleen; selvitä olemassa oleva varaus. Mockin `verified-mock-readback` ei todista tallennusta oikealle palvelimelle.
 
 Pending, canceled tai epäselvä vastaus ei ole onnistuminen. Kun kirjoitus on alkanut, yritys on pysyvästi terminaalinen, myös verkkovirheessä. Älä poista merkintää, varaa vaihtoehtoa tai yritä uudelleen. Sovita olemassa oleva varaus vain tarkalla read-backilla tai käyttäjän sallimalla vahvistusviestillä. Älä peru tai tee siivouskirjoitusta omin päin.
 

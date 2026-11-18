@@ -64,6 +64,9 @@ def validate_config(c):
  for w in c['windows']:
   if set(w)!={'start','end'} or aware(w['start'])<r or aware(w['end'])<=aware(w['start']):raise ValueError('invalid_window')
  if type(c['email_check_opt_in']) is not bool or not isinstance(c['note'],str):raise ValueError('note_email_types')
+ # HTML maxlength counts UTF-16 code units, not Python Unicode code points.
+ if c['note'] and not c['note'].strip():raise ValueError('note_blank')
+ if len(c['note'].encode('utf-16-le'))//2>2000:raise ValueError('note_too_long')
  return c
 
 def active_window(a,c,now):

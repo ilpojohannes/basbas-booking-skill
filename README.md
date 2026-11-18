@@ -6,8 +6,8 @@ Pöytä BasBasiin ilman keskiyön päivystystä. Skilli hoitaa agenttisi kanssa 
 
 ```mermaid
 flowchart TD
-    A["Milloin BasBasiin?<br/>Päivä, henkilömäärä ja toiveajat"] --> B["Ensin allergiat ja huomautukset<br/>jos niitä tarvitaan, varaa itse"]
-    B --> H["Jos huomautusta ei tarvita:<br/>yhteystiedot yksityisestä tiedostosta"]
+    A["Milloin BasBasiin?<br/>Päivä, henkilömäärä ja toiveajat"] --> B["Allergiat ja huomautukset<br/>mukaan varaukseen"]
+    B --> H["Yhteystiedot<br/>yksityisestä tiedostosta"]
     H --> C["Pyytää luvan varata pöydän BasBasista"]
     C --> D["Tarkistaa BasBasin varauspalvelun<br/>ja odottaa sovittua varaushetkeä"]
     D --> E["Yrittää toiveajat mieluisimmasta alkaen"]
@@ -21,9 +21,11 @@ flowchart TD
 
 **Sinä:** Pöytä neljälle BasBas Bistroon 25.11.2026. Mieluiten klo 18, sitten 19 tai 17.
 
-**Agentti:** Tarvitaanko allergia- tai muuta huomautusta? En pysty välittämään niitä. Jos tarvitaan, varaus pitää tehdä itse; en kysy vielä yhteystietoja.
+**Agentti:** Onko allergioita, erityisruokavalioita tai muuta kerrottavaa ravintolalle?
 
-**Sinä:** Ei tarvita.
+**Sinä:** Yksi on kasvissyöjä.
+
+**Agentti:** Lisään huomautuksen ”Yksi on kasvissyöjä.” ja tarkistan sen varauksen vahvistustiedoista.
 
 **Agentti:** Käytetään hyväksymääsi yksityistä yhteystietotiedostoa. Ennen lupapyyntöä tarkistan ehdot ja sovitaan yritysaika sekä minne kerron tuloksen. Kerron myös, jos ajastus ei onnistu.
 
@@ -54,7 +56,9 @@ Esimerkit löytyvät [templates](templates/)-kansiosta. Säilytä oikeat yhteyst
 - Vain BasBas Bistro, sovitut päivät ja ajat. Yksi päivä per asetustiedosto.
 - Oikea varaus vaatii lupasi sekä edellisen päivän ja varaushetken tarkistukset.
 - Ei tuplavarauksia: epäselvä lähetys selvitetään ennen uutta yritystä.
-- Maksuja ja korttitakuita ei tueta. Allergiahuomautus pysäyttää nykyversion, koska sen välitystä ei ole vielä toteutettu.
+- Maksuja ja korttitakuita ei tueta.
+- Allergia- ja ruokavaliohuomautukset välitetään täsmällisinä (enintään 2000 UTF-16-koodiyksikköä). Jos vahvistustiedoista puuttuu huomautus tai se on muuttunut, tulos jää epäselväksi: ei uutta varausta. Ravintolan mahdollisuutta toteuttaa pyyntöä ei voi luvata.
+- Huomautuspolku on testattu oikealla julkisella käyttöliittymällä ja paikallisilla testivastauksilla. Tällä muutoksella ei ole tehty oikeaa varausta tai todennettu huomautuksen tallentumista oikealle palvelimelle.
 - Sähköpostivarmistus on vapaaehtoinen ja vaatii agentin oman sähköpostiyhteyden. Osoitteen antaminen varausta varten ei anna postin lukulupaa.
 - Harjoituksen onnistuminen ei ole oikea varaus.
 

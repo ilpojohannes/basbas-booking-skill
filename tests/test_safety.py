@@ -6,14 +6,25 @@ import safety
 import runner
 C=json.loads((Path(__file__).resolve().parents[1]/'templates/campaign.example.json').read_text())
 class SafetyTests(unittest.TestCase):
- def test_note_refused_before_browser_contacts_or_evidence(self):
-  from unittest.mock import patch
-  for mode in ['dry-run','mock','commit']:
-   with self.subTest(mode=mode),patch('runner.sync_playwright',side_effect=AssertionError('browser_started')),patch('runner.load_contact',side_effect=AssertionError('contacts_read')),patch('safety.evidence_gate',side_effect=AssertionError('evidence_read')):
-    result,code=runner.run(dict(C,note='FICTIONAL: allergy'),mode)
-    self.assertEqual(result['reason'],'note_field_unknown')
-    self.assertEqual(result['outcome'],'fatal-before-write')
-    self.assertEqual(code,11)
+ def test_note_contract(self):
+  for note in ['', 'FICTIONAL: allergy', '  exact text\n ', 'x'*2000]:
+   self.assertEqual(safety.validate_config(dict(C,note=note))['note'],note)
+  for note in [None,False,[], '   ', '\n\t', 'x'*2001, '😀'*1001]:
+   with self.subTest(note_type=type(note).__name__),self.assertRaises(ValueError):safety.validate_config(dict(C,note=note))
+  self.assertNotEqual(safety.scope_hash(C),safety.scope_hash(dict(C,note='FICTIONAL: allergy')))
+ def test_note_exact_outbound(self):
+  for note in ['FICTIONAL: allergy',' exact\ntext ']:
+   runner.validate_note({'note':note},dict(C,note=note),'write')
+   for customer in [{},{'note':None},{'note':note.strip()+'changed'}]:
+    with self.assertRaises(runner.Stop):runner.validate_note(customer,dict(C,note=note),'write')
+  runner.validate_note({},C,'write')
+ def test_note_readback(self):
+  runner.validate_note({},C,'readback')
+  runner.validate_note({'note':None},C,'readback')
+  c=dict(C,note='FICTIONAL: allergy')
+  runner.validate_note({'note':c['note']},c,'readback')
+  for customer in [{},{'note':None},{'note':'different'}]:
+   with self.assertRaises(runner.Stop):runner.validate_note(customer,c,'readback')
  def test_config(self):self.assertEqual(safety.validate_config(C),C)
  def test_party(self):
   for n in [True,0,8,-1,'4']:
@@ -80,12 +91,26 @@ class SafetyTests(unittest.TestCase):
    p=Path(t)/'approval.json'
    def put(data):p.write_text(json.dumps(data));p.chmod(0o600)
    put(a);runner.approval(p,c,module)
-   for changes in [{'party':3},{'approved':False},{'used_at':now.isoformat()},{'terms_fingerprint':'changed'}]:
+   for changes in [{'note':'unapproved note'},{'party':3},{'approved':False},{'used_at':now.isoformat()},{'terms_fingerprint':'changed'}]:
     with self.subTest(changes=list(changes)),self.assertRaises(runner.Stop):put(dict(a,**changes));runner.approval(p,c,module)
  def test_contact_fake_json(self):
   with tempfile.TemporaryDirectory() as t:
    p=Path(t)/'contact.json';p.write_text((Path(__file__).resolve().parents[1]/'templates/contact.example.json').read_text());p.chmod(0o600)
    self.assertEqual(safety.load_contact(p)['BASBAS_EMAIL'],'diner@example.invalid')
+ def test_note_report_caveat(self):
+  import cli,io
+  from unittest.mock import patch
+  from contextlib import redirect_stdout
+  with tempfile.TemporaryDirectory() as t:
+   state=Path(t)/'state';config=Path(t)/'config.json';config.write_text(json.dumps(C))
+   safety.atomic_private_json(state/'attempts'/(C['campaign_id']+'.json'),{'stage':'submitted-or-ambiguous','note_delivery':'unverified','reason':'readback_note_unknown','note':'DO_NOT_EXPOSE','booking_token':'DO_NOT_EXPOSE'})
+   output=io.StringIO()
+   with patch.object(cli,'STATE',state),patch('sys.argv',['cli','report','--config',str(config)]),redirect_stdout(output):
+    self.assertEqual(cli.main(),0)
+   result=json.loads(output.getvalue())
+   self.assertEqual(result['note_delivery'],'unverified')
+   self.assertEqual(result['reason'],'readback_note_unknown')
+   self.assertNotIn('DO_NOT_EXPOSE',output.getvalue())
  def test_report_privacy(self):
   import privacy_scan
   self.assertEqual(privacy_scan.scan(),[])

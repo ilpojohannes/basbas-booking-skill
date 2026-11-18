@@ -14,7 +14,7 @@ def main():
    attempt=STATE/'attempts'/(c['campaign_id']+'.json')
    if attempt.exists():
     from safety import private_file
-    private_file(attempt);d=json.loads(attempt.read_text());info={k:v for k,v in d.items() if k in {'stage','date','party','slot','provider_status','booking_id'}}
+    private_file(attempt);d=json.loads(attempt.read_text());info={k:v for k,v in d.items() if k in {'stage','date','party','slot','provider_status','booking_id','note_delivery','reason'}}
    else:info={'outcome':'no_attempt'}
    code=0
   else:

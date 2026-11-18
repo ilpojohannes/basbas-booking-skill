@@ -97,8 +97,34 @@ def pick(slots,c):
    no_money(table);available.add(t[11:16])
  return next((v for v in c['slot_preferences'] if v in available),None)
 
+def validate_note(customer,c,stage):
+ # Preserve legacy no-note readback semantics; never trim approved text.
+ if stage=='readback' and not c['note']:return
+ if not isinstance(customer,dict):raise Stop(stage+'_note_unknown')
+ if c['note'] and 'note' not in customer:raise Stop(stage+'_note_unknown')
+ if customer.get('note','')!=c['note']:raise Stop(stage+'_note_mismatch')
+
+def prepare_details(page,contact,note,arm):
+ # The note is revealed only after contacts. Keep terms OFF until it is filled;
+ # the network guard independently rejects every premature submission.
+ terms=page.locator('#terms_accepted')
+ if terms.is_checked():raise Stop('terms_prematurely_checked')
+ page.locator('#first_name').fill(contact['BASBAS_FIRSTNAME'])
+ page.locator('#last_name').fill(contact['BASBAS_LASTNAME'])
+ page.locator('#email').fill(contact['BASBAS_EMAIL'])
+ page.locator('#phone').fill(phone_e164(contact['BASBAS_MOBILE'])[4:])
+ page.locator('#phone').blur()
+ if note:
+  field=page.locator('textarea#note')
+  expect(field).to_be_visible()
+  if field.get_attribute('maxlength')!='2000':raise Stop('note_field_contract')
+  field.fill(note)
+  expect(field).to_have_value(note)
+ arm()
+
 def validate_readback(d,c,slot,bid):
  no_money(d)
+ validate_note(d.get('customer',{}),c,'readback')
  expected={'id':bid,'restaurant_id':RID,'module_id':MID,'date':c['date'],'persons':c['party']}
  if any(type(d.get(k)) is not type(v) or d.get(k)!=v for k,v in expected.items()) or d.get('status') not in ('confirmed','reserved'):raise Stop('readback_scope_or_status')
  state=d.get('state')
@@ -145,7 +171,7 @@ def _run(c,mode,approval_path=None,contact_path=None,report=None,mock_status='re
  if mode=='commit':
   from safety import evidence_gate
   evidence_gate(c)
- sensitive=False; wrote=False; bid=None; token=None; selected=None; failed=[]; seen={}; blocked=0
+ sensitive=False; submission_ready=False; wrote=False; bid=None; token=None; selected=None; failed=[]; seen={}; blocked=0
  attempt=None;ap=None;record={};mock_payload=None;asset_urls=set();module=None
  def persist(stage,**extra):
   record.update(stage=stage,at_helsinki=datetime.now(HELSINKI).isoformat(),**extra)
@@ -202,8 +228,10 @@ def _run(c,mode,approval_path=None,contact_path=None,report=None,mock_status='re
     asset_urls.add(req.url);route.continue_();return
    blocked+=1;route.abort()
   except Exception as e:
+   blocked+=1
    failed.append(str(e) if isinstance(e,Stop) else type(e).__name__);route.abort()
  def check_post(req):
+  if not submission_ready:raise Stop('premature_write_blocked')
   if mode=='commit':approval(approval_path,c,module)
   if failed:raise Stop('prewrite_provider_failure')
   # Recheck the completed response data at dispatch, not only before contact entry.
@@ -223,7 +251,7 @@ def _run(c,mode,approval_path=None,contact_path=None,report=None,mock_status='re
   expected={'first_name':contact['BASBAS_FIRSTNAME'],'last_name':contact['BASBAS_LASTNAME'],'email':contact['BASBAS_EMAIL'],'phone':phone_e164(contact['BASBAS_MOBILE'])}
   if any(customer.get(k)!=v for k,v in expected.items()):raise Stop('write_contact_mismatch')
   if set(customer)-set(expected)-{'address','extra_address','postcode','city','company','country','accept_email','accept_sms','locale','note'}:raise Stop('write_customer_keys')
-  if customer.get('note','')!=c['note']:raise Stop('write_note_mismatch')
+  validate_note(customer,c,'write')
   if any(customer.get(k) not in ('',None) for k in ('address','extra_address','postcode','city','company','country')):raise Stop('write_unapproved_customer_fields')
   if customer.get('accept_email') is not True or customer.get('accept_sms') is not True:raise Stop('transactional_notifications_contract')
   no_money(d)
@@ -302,11 +330,17 @@ def _run(c,mode,approval_path=None,contact_path=None,report=None,mock_status='re
    if any(x in text for x in ('captcha','card guarantee','cancellation fee','prepayment','pay now','credit card')):raise Stop('fee_or_challenge_ui')
    marketing=page.locator('#restaurant_marketing')
    if marketing.count() and marketing.is_checked():raise Stop('marketing_checked')
-   page.locator('#terms_accepted').check()
    sensitive=True
+   def arm_submission():
+    nonlocal submission_ready
+    if failed:raise Stop(failed[0])
+    if mode=='commit':approval(approval_path,c,module)
+    submission_ready=True
+   prepare_details(page,contact,c['note'],arm_submission)
    with page.expect_response(lambda r:r.request.method=='POST' and urlsplit(r.url).path==REST+'/book'):
-    page.locator('#first_name').fill(contact['BASBAS_FIRSTNAME']);page.locator('#last_name').fill(contact['BASBAS_LASTNAME']);page.locator('#email').fill(contact['BASBAS_EMAIL']);page.locator('#phone').fill(phone[4:]);page.locator('#phone').blur()
-    page.get_by_role('button',name='Continue',exact=True).click()
+    page.locator('#terms_accepted').check()
+    # If checking terms itself submitted, never click again.
+    if not wrote:page.get_by_role('button',name='Continue',exact=True).click()
    if failed:raise Stop(failed[0])
    if not bid:raise Stop('missing_booking_id')
    # Read back exact booking through browser fetch (routes still enforce read allowlist).
@@ -320,8 +354,8 @@ def _run(c,mode,approval_path=None,contact_path=None,report=None,mock_status='re
    else:
     body=page.locator('body').inner_text()
     if 'Baskeri & Basso' not in body or selected.replace(':','.') not in body or f"{c['party']} guest" not in body or datetime.fromisoformat(c['date']).strftime('%-d %B %Y') not in body:raise Stop('confirmation_ui_scope')
-   if mode=='commit':persist('confirmed',booking_id=bid,slot=selected,provider_status=data['status'])
-   info.update(local_datetime=c['date']+'T'+selected, timezone='Europe/Helsinki', provider_status=data['status'])
+   if mode=='commit':persist('confirmed',booking_id=bid,slot=selected,provider_status=data['status'],note_delivery='verified-provider-readback' if c['note'] else 'not-requested')
+   info.update(local_datetime=c['date']+'T'+selected, timezone='Europe/Helsinki', provider_status=data['status'],note_delivery=('verified-mock-readback' if mode=='mock' else 'verified-provider-readback') if c['note'] else 'not-requested')
    info.update(outcome='confirmed' if mode=='commit' else 'mock-confirmed',booking_id=bid,blocked_requests=blocked)
    if report:atomic_private_json(report,info)
    return info,0
@@ -331,10 +365,13 @@ def _run(c,mode,approval_path=None,contact_path=None,report=None,mock_status='re
    if mode in ('commit','dry-run'):
     try:append_event(campaign_directory(c)/'diagnostics.jsonl','guarded_error',mode=mode,detail=private_error_text(str(e),Path(contact_path) if contact_path else Path('unused')))
     except Exception:pass
-   if mode=='mock':atomic_private_json(campaign_directory(c)/'mock-diagnostic.json',{'error':str(e),'body':page.locator('body').inner_text(),'failed':failed,'form_fields':page.locator('input, textarea').evaluate_all('(els)=>els.map(e=>({id:e.id,name:e.name,type:e.type}))')})
-   reason=str(e) if isinstance(e,Stop) else type(e).__name__
-   if mode=='commit' and wrote:persist('submitted-or-ambiguous',reason=reason,booking_id=bid,slot=selected)
+   if mode=='mock':atomic_private_json(campaign_directory(c)/'mock-diagnostic.json',{'error':str(e) if isinstance(e,Stop) else type(e).__name__,'failed':failed})
+   reason=failed[0] if failed else (str(e) if isinstance(e,Stop) else type(e).__name__)
+   if mode=='commit' and wrote:persist('submitted-or-ambiguous',reason=reason,booking_id=bid,slot=selected,note_delivery='unverified' if c['note'] else 'not-requested')
    info={'mode':mode,'outcome':'submitted-or-ambiguous' if wrote else 'fatal-before-write','reason':reason,'blocked_requests':blocked,'terms_fingerprint':fingerprint(module) if module else None,'last_bookable_date':module.get('last_bookable_date') if module else None}
+   if c['note']:
+    info['note_delivery']='unverified'
+    if wrote:info['warning']='note_delivery_not_verified_do_not_retry_reconcile_booking'
    retryable=not wrote and not (attempt and attempt.exists()) and (reason in ('target_day_not_released','no_authorized_slot') or (mode=='dry-run' and reason in ('TimeoutError','Error')))
    if retryable:info['outcome']='retryable-before-write'
    if report:atomic_private_json(report,info)
@@ -342,13 +379,8 @@ def _run(c,mode,approval_path=None,contact_path=None,report=None,mock_status='re
   finally:ctx.close();b.close()
 
 def run(c,mode,approval_path=None,contact_path=None,report=None,mock_status='reserved',mock_slots=None):
- # Notes are unsupported even if a future UI happens to render a note field.
- # Refuse before browser startup, private state, scheduling evidence or contacts.
+ # Validate note/scope before browser startup, private state or contacts.
  validate_scope(c)
- if c['note']:
-  info={'mode':mode,'outcome':'fatal-before-write','reason':'note_field_unknown','blocked_requests':0}
-  if report:atomic_private_json(report,info)
-  return info,11
  if mode=='commit':
   with commit_lock():return _run(c,mode,approval_path,contact_path,report,mock_status,mock_slots)
  return _run(c,mode,approval_path,contact_path,report,mock_status,mock_slots)
