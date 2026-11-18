@@ -1,5 +1,7 @@
-# Lisenssihuomautus
+# Lisenssi ja kolmannet osapuolet
 
-Tämä paketti sisältää uutta paikallisesti laadittua agentti-/turvakoodia sekä käyttäjän olemassa olevasta paikallisesta BasBas-ajurista tarkistettuja ja yleistettyjä osia. Julkaisuun ei ole tässä annettu lupaa. Olemassa olevan koodin omistajan on vahvistettava oikeudet ennen julkista lisensointia; koko paketille ei siksi väitetä MIT- tai muuta lisenssiä.
+Paketin koodi ja dokumentaatio on julkaistu [MIT-lisenssillä](LICENSE). Tekijänoikeus: Ilpo Ryynänen, 2026.
 
-Kolmannen osapuolen kirjastoja ei ole kopioitu mukaan. Playwright asennetaan erillisenä riippuvuutena sen omilla ehdoilla. Mock-fixture sisältää havaittuun API-skeemaan perustuvaa synteettistä testidataa, ei palveluntarjoajan kokonaisia käyttöehto- tai tietosuojadokumentteja. Julkiset paikka-ID:t ja lyhyt Bistro-tunnistuslause ovat adapterin toiminnan kannalta välttämättömiä. TableOnline-palvelu ja tavaramerkit säilyvät niiden haltijoilla.
+Kolmannen osapuolen kirjastoja ei ole kopioitu mukaan. Playwright asennetaan erillisenä riippuvuutena sen omilla lisenssiehdoilla. Testidata on synteettistä; paketti ei sisällä palveluntarjoajan kokonaisia käyttöehto- tai tietosuojadokumentteja.
+
+MIT-lisenssi ei myönnä oikeuksia BasBasin tai TableOnlinen tavaramerkkeihin, palveluihin tai niiden aineistoihin. Palvelujen käyttöön sovelletaan niiden omia ehtoja. Tämä on riippumaton skilli, ei ravintolan tai varauspalvelun virallinen tuote.

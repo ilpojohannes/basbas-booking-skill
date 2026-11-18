@@ -45,4 +45,4 @@ Esimerkit löytyvät [templates](templates/)-kansiosta. Säilytä oikeat yhteyst
 - Sähköpostivarmistus on vapaaehtoinen ja vaatii agentin oman sähköpostiyhteyden. Osoitteen antaminen varausta varten ei anna postin lukulupaa.
 - Harjoituksen onnistuminen ei ole oikea varaus.
 
-Lisenssitiedot: [LICENSE-NOTE.md](LICENSE-NOTE.md).
+Julkaistu [MIT-lisenssillä](LICENSE). [Kolmansien osapuolten oikeudet](LICENSE-NOTE.md).
