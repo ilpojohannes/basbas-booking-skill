@@ -6,16 +6,20 @@ Tavoite: pöytä alkuperäiseen Baskeri & Basso Bistroon. Ei lupausta pöydäst�
 
 ```mermaid
 flowchart TD
-    A["Kysyy päivän, henkilömäärän ja toiveajat"] --> B["Pyytää luvan oikean varauksen tekemiseen"]
-    B --> C["Valmistelee yrityksen ja tarkistaa, että kaikki toimii"]
-    C --> D["Odottelee sovittua varaushetkeä"]
-    D --> E["Yrittää varata toiveajat mieluisimmasta alkaen"]
-    E --> F["Tarkistaa tuloksen ja kertoo, onnistuiko varaus"]
-    F -. "Jos haluat" .-> G["Tarkistaa vahvistuksen myös sähköpostista"]
+    A["Milloin BasBasiin?<br/>Kysyy päivän, henkilömäärän ja toiveajat"] --> B["Kenen nimellä pöytä varataan?<br/>Pyytää nimen, sähköpostin ja puhelinnumeron yksityisesti"]
+    B --> C["Kysyy allergiat ja erityisruokavaliot"]
+    C --> D["Pyytää luvan varata pöydän BasBas Bistrosta"]
+    D --> E["Tarkistaa BasBasin varauspalvelun toiminnan<br/>ja milloin haluttu päivä tulee varattavaksi"]
+    E --> F["Odottelee sovittua varaushetkeä"]
+    F --> G["Yrittää varata BasBasista yhden pöydän<br/>toiveajat mieluisimmasta alkaen"]
+    G --> H["Tarkistaa BasBasin vahvistuksen<br/>ja kertoo tuloksen käyttäjälle"]
+    H -. "Jos haluat" .-> I["Tarkistaa BasBasin vahvistuksen myös sähköpostistasi"]
 ```
 
 Vain BasBas Bistro. Vain sovitut päivät ja ajat. Ei tuplavarauksia.
 Pöydän saamista ei voi taata. Ajastettu yritys ja sähköpostitarkistus edellyttävät, että agentillasi on niihin tarvittavat yhteydet.
+Varaajan sähköpostiosoite tarvitaan varausta varten; sähköpostien lukemiseen kysytään erillinen lupa.
+Jos allergiatietoa ei voida välittää turvallisesti BasBasiin, skilli pysähtyy eikä jätä tietoa pois.
 
 ## Käyttöönotto
 
