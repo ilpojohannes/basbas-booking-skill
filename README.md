@@ -2,6 +2,21 @@
 
 Tavoite: pöytä alkuperäiseen Baskeri & Basso Bistroon. Ei lupausta pöydästä, eikä salaa yhdeksää varapöytää.
 
+## Näin varaus etenee
+
+```mermaid
+flowchart TD
+    A["Kysyy päivän, henkilömäärän ja toiveajat"] --> B["Pyytää luvan oikean varauksen tekemiseen"]
+    B --> C["Valmistelee yrityksen ja tarkistaa, että kaikki toimii"]
+    C --> D["Odottelee sovittua varaushetkeä"]
+    D --> E["Yrittää varata toiveajat mieluisimmasta alkaen"]
+    E --> F["Tarkistaa tuloksen ja kertoo, onnistuiko varaus"]
+    F -. "Jos haluat" .-> G["Tarkistaa vahvistuksen myös sähköpostista"]
+```
+
+Vain BasBas Bistro. Vain sovitut päivät ja ajat. Ei tuplavarauksia.
+Pöydän saamista ei voi taata. Ajastettu yritys ja sähköpostitarkistus edellyttävät, että agentillasi on niihin tarvittavat yhteydet.
+
 ## Käyttöönotto
 
 Python 3.11+ ja Playwright tarvitaan. Käytä omaa virtuaaliympäristöä. Paketti ei asenna riippuvuuksia, selainta, ajastuksia tai maksullisia palveluja automaattisesti.
