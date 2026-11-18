@@ -1,6 +1,8 @@
-# BasBas-varausagentti — v1
+# BasBas-pöytävarausskilli — v1
 
-Tavoite: pöytä alkuperäiseen Baskeri & Basso Bistroon. Ei lupausta pöydästä, eikä salaa yhdeksää varapöytää.
+Skilli, joka opastaa tekoälyagenttiasi varaamaan pöydän alkuperäisestä Baskeri & Basso Bistrosta. Tämä ei ole erillinen agentti tai varauspalvelu.
+
+Tavoite: pöytä BasBasiin. Ei lupausta pöydästä, eikä salaa yhdeksää varapöytää.
 
 ## Näin varaus etenee
 
