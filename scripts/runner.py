@@ -289,7 +289,6 @@ def _run(c,mode,approval_path=None,contact_path=None,report=None,mock_status='re
     data=seen[REST+suffix];no_money(data)
     if data.get(key)!=[]:raise Stop('unknown_items_or_promotions')
    if failed:raise Stop(failed[0])
-   if c['note'] and page.locator('#note').count()!=1:raise Stop('note_field_unknown')
    if mode=='dry-run':
     info['outcome']='dry-run-ready'
     if report:atomic_private_json(report,info)
@@ -305,9 +304,6 @@ def _run(c,mode,approval_path=None,contact_path=None,report=None,mock_status='re
    if marketing.count() and marketing.is_checked():raise Stop('marketing_checked')
    page.locator('#terms_accepted').check()
    sensitive=True
-   if c['note']:
-    if page.locator('#note').count()!=1:raise Stop('note_field_unknown')
-    page.locator('#note').fill(c['note'])
    with page.expect_response(lambda r:r.request.method=='POST' and urlsplit(r.url).path==REST+'/book'):
     page.locator('#first_name').fill(contact['BASBAS_FIRSTNAME']);page.locator('#last_name').fill(contact['BASBAS_LASTNAME']);page.locator('#email').fill(contact['BASBAS_EMAIL']);page.locator('#phone').fill(phone[4:]);page.locator('#phone').blur()
     page.get_by_role('button',name='Continue',exact=True).click()
@@ -346,6 +342,13 @@ def _run(c,mode,approval_path=None,contact_path=None,report=None,mock_status='re
   finally:ctx.close();b.close()
 
 def run(c,mode,approval_path=None,contact_path=None,report=None,mock_status='reserved',mock_slots=None):
+ # Notes are unsupported even if a future UI happens to render a note field.
+ # Refuse before browser startup, private state, scheduling evidence or contacts.
+ validate_scope(c)
+ if c['note']:
+  info={'mode':mode,'outcome':'fatal-before-write','reason':'note_field_unknown','blocked_requests':0}
+  if report:atomic_private_json(report,info)
+  return info,11
  if mode=='commit':
   with commit_lock():return _run(c,mode,approval_path,contact_path,report,mock_status,mock_slots)
  return _run(c,mode,approval_path,contact_path,report,mock_status,mock_slots)
@@ -354,8 +357,6 @@ def main():
  p=argparse.ArgumentParser();p.add_argument('--config',required=True);p.add_argument('--mode',choices=['dry-run','mock','commit'],default='dry-run');p.add_argument('--approval-file');p.add_argument('--contact-file',default=None);p.add_argument('--report');p.add_argument('--mock-status',default='reserved',choices=['confirmed','reserved','pending','canceled'])
  a=p.parse_args();private_file(a.config);c=json.loads(Path(a.config).read_text())
  if a.mode=='commit':
-  from safety import evidence_gate
-  evidence_gate(c)
   if not a.approval_file:p.error('--approval-file required')
   info,code=run(c,a.mode,a.approval_file,a.contact_file,a.report)
  else:info,code=run(c,a.mode,report=a.report,mock_status=a.mock_status)

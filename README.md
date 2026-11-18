@@ -6,13 +6,23 @@ Pöytä BasBasiin ilman keskiyön päivystystä. Skilli hoitaa agenttisi kanssa 
 
 ```mermaid
 flowchart TD
-    A["Milloin BasBasiin?<br/>Päivä, henkilömäärä ja toiveajat"] --> B["Varaajan nimi, sähköposti ja puhelinnumero<br/>sekä mahdolliset allergiat"]
-    B --> C["Pyytää luvan varata pöydän BasBasista"]
+    A["Milloin BasBasiin?<br/>Päivä, henkilömäärä ja toiveajat"] --> B["Ensin allergiat ja huomautukset<br/>jos niitä tarvitaan, varaa itse"]
+    B --> H["Jos huomautusta ei tarvita:<br/>yhteystiedot yksityisestä tiedostosta"]
+    H --> C["Pyytää luvan varata pöydän BasBasista"]
     C --> D["Tarkistaa BasBasin varauspalvelun<br/>ja odottaa sovittua varaushetkeä"]
     D --> E["Yrittää toiveajat mieluisimmasta alkaen"]
     E --> F["Tarkistaa BasBasin vahvistuksen<br/>ja kertoo tuloksen"]
     F -. "Vain luvallasi" .-> G["Tarkistaa vahvistuksen myös sähköpostistasi"]
 ```
+
+## Esimerkkikeskustelu
+
+*Kuvitteellinen tilanne, ei oikea varaus.*
+
+**Sinä:** Pöytä neljälle BasBas Bistroon 25.11.2026. Mieluiten klo 18, sitten 19 tai 17.
+**Agentti:** Tarvitaanko allergia- tai muuta huomautusta? En pysty välittämään niitä. Jos tarvitaan, varaus pitää tehdä itse; en kysy vielä yhteystietoja.
+**Sinä:** Ei tarvita.
+**Agentti:** Käytetään hyväksymääsi yksityistä yhteystietotiedostoa. Ennen lupapyyntöä tarkistan ehdot ja sovitaan yritysaika sekä minne kerron tuloksen. Kerron myös, jos ajastus ei onnistu.
 
 ## Aloita tästä
 

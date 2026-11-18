@@ -11,6 +11,8 @@ Virallinen sivu https://basbas.fi/bistro/ ja sen varauslinkki. Nykyinen moduuli 
 
 ## 1. Kysy puuttuvat asiat, älä täytä niitä itse
 
+**Kerro heti ennen yhteystietoja tai ajastusta:** ”Tämä versio ei välitä allergioita, erityisruokavalioita tai muita huomautuksia ravintolalle. Jos tarvitset sellaisen, emme jatka automaattivarausta; varaa itse ravintolan virallisen varauslinkin kautta ja varmista huomautuksen perillemeno ravintolalta.” Kysy tämän jälkeen, tarvitaanko huomautusta. Jos kyllä, pysähdy tähän: älä kerää yhteystietoja, pyydä varausvaltuutusta tai luo ajastusta. Älä ehdota allergian pois jättämistä. `note_field_unknown` on ehdoton este jo ennen selaimen käynnistystä, ei yritys kokeilla mahdollista uutta lomakekenttää.
+
 - Ruokailupäivä **vuosineen** tai paremmuusjärjestykseen laitetut vaihtoehtoiset päivät. Tarkista päivämäärän viikonpäivä ohjelmallisesti ja kerro ristiriidasta. Älä muuta päivää hiljaa.
 - Henkilömäärä. Tarkista nykyisestä live-käyttöliittymästä tuettu määrä (v1 hyväksyy 1–7, ei tarkoita että pöytiä löytyy).
 - Ovatko kellonajat **täsmällinen paremmuusjärjestys** (esim. 18, 19, 17) vai **jatkuva aikaväli**, jonka sisällä muita aloitusaikoja saa valita? Diskreettiin listaan ei saa keksiä väliaikoja. Aikavälille kysy ihanneaika ja tasatilanteen järjestys; muodosta vasta sitten eksplisiittinen `slot_preferences`.
@@ -35,6 +37,20 @@ Yhteenveto: Bistro, tarkat päivät ja niiden järjestys, henkilömäärä, kell
 Pyydä yksiselitteinen lupa: ”Saanko varata tämän yhteenvedon mukaisen ensimmäisen sallitun pöydän näissä aikarajoissa ilman uutta kysymystä?” Täsmällinen ennakkovaltuutus riittää vapautumishetkellä. Tallenna hyväksyntä erilliseen 0600 tiedostoon vasta vastauksen jälkeen. Se sisältää kampanjan kaikki kentät, täsmällisen paikan ja live-ehtojen sormenjäljen. Älä luo hyväksyntää mallipohjan `approved=false` vaihtamiseksi omin päin.
 
 Uusi maksu, ennakkomaksu, korttitakuu, no-show/peruutusmaksu, minimikulutus, olennainen ehtomuutos, CAPTCHA tai 3-D Secure: **pysähdy ja pyydä uusi päätös**. V1 ei tue maksuvelvoitteita edes yleisellä varausluvalla. Älä muuta ehtohashia vain saadaksesi testit läpi.
+
+## Ennen varausyötä: valmiuslista
+
+Sano ”valmistelut ovat valmiit” vasta kun **kaikki** on todennettu:
+
+- [ ] Bistro, päivät, henkilömäärä, aikajärjestys ja yritysikkunat on sovittu; huomautusta ei tarvita. Käyttäjän täsmällinen varausvaltuutus on tallennettu tälle kokonaisuudelle ja nykyisille ehdoille.
+- [ ] Yhteystietolähde on käyttäjän hyväksymä ja erillinen yksityinen 0600-tiedosto; ympäröivä hakemisto 0700. Ei yhteystietoja chattiin tai ajastimen komentoon.
+- [ ] Paikallinen selain toimii. Edellisen päivän `previous-day` on tuottanut tuoreen `compatibility-ready`-tuloksen samalle `scope_hash`-arvolle, `mode=dry-run`; palveluntarjoajan kirjoitukset on estetty ja paikalliset harjoitukset läpäisty. Tarkista myös oikea päivä kohdan 4 mukaan.
+- [ ] Käyttäjän hyväksymä kestävä kertaluonteinen ajastus on luettu takaisin käytössä olevasta ajastimesta: täsmälleen sovittu suoritushetki, aikavyöhyke, komento, yksi kampanja ja sallittu aikaraja. Pelkkä työkalun löytyminen ei riitä.
+- [ ] Tuloksen yksityinen toimituskohde ja käyttöoikeus on tarkistettu käytössä olevasta viestiyhteydestä. Älä arvaa kohdetta tai päättele toimitusta ajastuksen onnistumisesta.
+
+Puuttuva tai vanhentunut tarkistus tarkoittaa ”valmistelu kesken”, kerro puuttuva kohta. `scripts/host_adapter.py:readiness` tarjoaa testattavan, vain lukevan yhteenvedon: anna `expected_job` (id/at/argv), sama `scope_hash`, `provider_preflight` (tallennettu previous-day-tulos) sekä erikseen todennetut `scope_authorized`, `contacts_private` ja `delivery_verified`. Sovitin lukee ajastuksen itse takaisin. Muut hyväksynnät ovat kutsujan todennuksia, eivät automaattista yhteystietojen tai viestiyhteyden tarkistusta. Paketti ei toteuta ajastinta eikä tulosten lähettäjää.
+
+`preparation-ready` tarkoittaa vain valmisteluja: se ei väitä vapautumatonta pöytää saatavaksi eikä anna kirjoituslupaa (`inventory_verified=false`, `commit_allowed=false`). Vapautumishetkellä tarvitaan vielä tuore `release-rehearsal`, oikea saatavuus ja kaikki runnerin turvaportit. Myöhempi epäonnistuminen mitätöi aiemman valmiuden.
 
 ## 4. Turvallinen valmistelu ja ajo
 

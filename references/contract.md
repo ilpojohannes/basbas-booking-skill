@@ -8,7 +8,7 @@ Aikojen käyttäjäranking voittaa palvelimen järjestyksen. Waitlist-only, muu 
 
 Mock-fixture on skeeman perusteella laadittu synteettinen testidata. Oikeita käyttöehto- tai tietosuojadokumentteja ei jaeta mukana. Lyhyt paikan tunnistuslause ja julkiset ID:t ovat adapterin välttämättömiä tunnisteita. Testiehdot eivät koskaan kelpaa live-hyväksynnäksi.
 
-Huomautuskenttä on provider-konfiguraation kenttälistassa, mutta havaitussa nykyisessä Details-UI:ssa sitä ei renderöidä. Tästä syystä ei-tyhjä huomautus on `note_field_unknown`-este ennen yhteystietoja. Allergioita ei saa jättää pois automatisoinnin mahdollistamiseksi. V1:n maksu-/guarantee-tuki on tarkoituksella nolla.
+Huomautuskenttä on provider-konfiguraation kenttälistassa, mutta havaitussa nykyisessä Details-UI:ssa sitä ei renderöidä. Tästä syystä ei-tyhjä huomautus on aina `note_field_unknown`-este jo ennen selainta tai yhteystietoja. Rajoitus kerrotaan heti keskustelun alussa, ennen yhteystietojen pyytämistä tai ajastusta; käyttäjä ohjataan tekemään huomautusta tarvitseva varaus itse. Allergioita ei saa jättää pois automatisoinnin mahdollistamiseksi. V1:n maksu-/guarantee-tuki on tarkoituksella nolla.
 
 Selaimen ulkopuolinen suora API GET voi palauttaa 403, vaikka kirjoitukset estetty selain toimii. Älä päättele palvelun olevan alhaalla tämän perusteella äläkä kierrä estettä kirjoituskutsuilla.
 

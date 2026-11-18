@@ -6,6 +6,14 @@ import safety
 import runner
 C=json.loads((Path(__file__).resolve().parents[1]/'templates/campaign.example.json').read_text())
 class SafetyTests(unittest.TestCase):
+ def test_note_refused_before_browser_contacts_or_evidence(self):
+  from unittest.mock import patch
+  for mode in ['dry-run','mock','commit']:
+   with self.subTest(mode=mode),patch('runner.sync_playwright',side_effect=AssertionError('browser_started')),patch('runner.load_contact',side_effect=AssertionError('contacts_read')),patch('safety.evidence_gate',side_effect=AssertionError('evidence_read')):
+    result,code=runner.run(dict(C,note='FICTIONAL: allergy'),mode)
+    self.assertEqual(result['reason'],'note_field_unknown')
+    self.assertEqual(result['outcome'],'fatal-before-write')
+    self.assertEqual(code,11)
  def test_config(self):self.assertEqual(safety.validate_config(C),C)
  def test_party(self):
   for n in [True,0,8,-1,'4']:
